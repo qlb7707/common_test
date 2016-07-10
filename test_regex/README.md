@@ -77,6 +77,47 @@ int main()
     }
 }
 ```
+####指定使用正则表达式时的错误
+
+
+如果我们编写的正则表达式存在错误，则运行时会抛出一个类型为***regex_error***的异常，***regex_error***有一个**what**操作描述发生了什么错误，还有一个**code**成员返回某个错误类型对应的编码。
+
+####正则表达式类和输入序列类型
+#####regex类
+regex类保存类型char的正则表达式，wregex类保存类型为**wchar_t**
+
+#####匹配和迭代器类型
+
+类型差异不仅在于字符类型，还在于序列是在string中还是在数组中
+- smatch :表示string类型序列
+- cmatch :表示字符数组序列
+- wsmatch:表示宽字符串（string）序列
+- wcmatch:表示宽字符数组
+
+**note: RE库类型必须与输入序列类型匹配**
+
+|序列类型|正则表达式类|
+|:---:|:---:|
+|string|regex、smatch、ssub\_match、sregex\_iterator|
+|const char *|regex、cmatch、csub\_match、cregex\_iterator|
+|wstring|wregex、wsmatch、wssub\_match、wsregex\_iterator|
+|const wchar_t *|wregex、wcmatch、wcsub\_match、wcregex\_iterator|
+
+###匹配与Regex迭代器类型
+**sregex\_iterator 操作：**
+|操作|作用|
+|:---:|:---:|
+|sregex\_iterator it(b,e,r)|一个sregex\_iterator迭代器，遍历b和e表示的string并将it定位到第一个匹配的位置|
+|sregex\_iterator end|尾后迭代器|
+|*it(it->)|根据最后一个调用regex\_search的结果，返回一个smatch的对象引用或指向smatch的指针|
+|it++|从序列当前匹配位置开始调用regex\_search，返回递增后的迭代器|
+|it++|从序列当前匹配位置开始调用regex\_search，返回递增前的迭代器|
+|it1 == it2(it1 != it2)|如果两个都是尾后迭代器则相等，非尾后迭代器从相同到序列和regex构造则相等|
+
+
+####使用sregex\_iterator
+
+#####test3--查找所有违反test1中规则的单词
 
 
 
