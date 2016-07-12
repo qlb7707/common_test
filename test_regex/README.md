@@ -120,5 +120,29 @@ regex类保存类型char的正则表达式，wregex类保存类型为**wchar_t**
 
 #####test3--查找所有违反test1中规则的单词
 
+```
 
+#include<iostream>
+#include<regex>
+using namespace std;
+
+int main()
+{
+    string pattern("[^c]ei");
+    pattern = "[[:alpha:]]*" + pattern + "[[:alpha:]]*";
+    regex r(pattern);
+    smatch result;
+    string test_str = "receipt freind theif receive";
+   /* regex_search(test_str,result,r);
+    for(smatch::iterator it = result.begin(); it != result.end(); ++it)
+    {
+        cout<<it->str()<<endl;
+    }*/
+    for(sregex_iterator it(test_str.begin(),test_str.end(),r),end_it; it != end_it; it++)
+    {
+        cout<<it->str()<<endl;
+    }
+}
+
+```
 
