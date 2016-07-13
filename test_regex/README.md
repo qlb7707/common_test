@@ -146,3 +146,53 @@ int main()
 
 ```
 
+####使用匹配数据
+
+匹配类型有名为prefix和suffix的成员，分别表示分别表示输入序列中当前的匹配之前和之后部分的ssub\_match对象。一个ssub\_match对象有str和length的成员，返回匹配的string和string的长度。
+
+
+#####test4--prefix & suffix
+
+
+```
+
+#include<iostream>
+#include<regex>
+using namespace std;
+
+int main()
+{
+    string pattern("[^c]ei");
+    pattern = "[[:alpha:]]*" + pattern + "[[:alpha:]]*";
+    regex r(pattern);
+    smatch result;
+    string test_str = "receipt freind theif receive";
+    for(sregex_iterator it(test_str.begin(),test_str.end(),r),end_it; it != end_it; it++)
+    {
+        auto pos = it->prefix().length();
+        pos = pos > 40? pos - 40 : 0;
+        cout<<it->prefix().str().substr(pos)
+            <<"\n\t\t>>> "<< it->str()<<" <<<\n"
+            <<it->suffix().str().substr(0,40)
+            <<endl;
+    }
+}
+
+```
+
+
+
+#####smatch操作
+
+|操作|作用|
+|:---:|:---:|
+|m.ready()|如果调用regex\_search或regex\_match则返回true否则返回false|
+|m.size()|如果失败返回0，否则返回最近一次匹配的正则表达式中子表达式的数目|
+|m.empty()|若m.size()为0，则返回true|
+|m.prefix()|一个ssub\_match对象，表示当前匹配之前的序列|
+|m.suffix()|一个ssub\_match对象，表示当前匹配之后的序列|
+|m.length(n)|第n个子表达式的大小默认为0|
+|m.position(n)|第n个子表达式距序列开始的距离|
+|m.str(n)|第n个子表达式匹配的string|
+|m.begin(),m.end()|m中元素范围迭代器|
+|m.cbegin(),m.cend()|常量迭代器|
