@@ -196,3 +196,87 @@ int main()
 |m.str(n)|第n个子表达式匹配的string|
 |m.begin(),m.end()|m中元素范围迭代器|
 |m.cbegin(),m.cend()|常量迭代器|
+
+
+####使用子表达式
+
+正则表达式通常包含一个或多个子表达式。正则表达式通常用括号表示子表达式。
+
+```
+regex r("([[:alnum:]]+)\\.(cpp|cxx|cc)$",regex::icase);
+
+```
+- ([[:alnum:]]+)，匹配一个或多个字符的序列
+- (cpp|cxx|cc)，匹配文件扩展名
+
+#####test5--test2只返回文件名，不带扩展名
+
+```
+#include<iostream>
+#include<regex>
+using namespace std;
+
+int main()
+{
+    regex r("([[:alnum:]]+)\\.(cpp|cxx|cc)$",regex::icase);
+    smatch results;
+    string filename;
+    while(cin>>filename)
+    {
+        if(regex_search(filename,results,r))
+            cout<<results.str(1)<<endl;    //str中参数n表示第n个子表达式，默认为0，表示整个匹配
+
+    }
+}
+```
+
+####使用子匹配操作
+
+|子匹配操作|作用|
+|:---:|:---:|
+|matched|一个public bool成员，指出此ssub\_match是否匹配了|
+|first，second|public数据成员，指向匹配序列的首元素和尾后迭代器|
+|length()|匹配的大小，如果matched为false返回0|
+|str()|返回一个包含输入中匹配部分的string，如果matched为false，返回空string|
+|s=ssub|将ssub\_match对象ssub转化为string对象s。等价于s＝ssub.str()|
+
+#####test6--匹配并验证电话号码
+
+```
+#include<iostream>
+#include<regex>
+using namespace std;
+
+bool valid(const smatch &m)
+{
+    if(m[1].matched)
+        return m[3].matched && (m[4].matched == false || m[4].str() == " ");
+    else
+        return !m[3].matched && m[4].str() == m[6].str();
+
+}
+
+
+
+int main()
+{
+    //左"("，三位数字，右")"，"."或"-"或" "，三位数字，"或"-"或" "，四位数字
+    //"?"表示可有可无
+    string phone = "(\\()?(\\d{3})(\\))?([-. ])?(\\d{3})([-. ])?(\\d{4})";
+
+    regex r(phone);
+    string s;
+    while(getline(cin,s))
+    {
+        for(sregex_iterator it(s.begin(),s.end(),r),end_it; it != end_it; it++)
+        {
+            if(valid(*it))
+                cout<<"valid:"<<it->str()<<endl;
+            else
+                cout<<"invalid:"<<it->str()<<endl;
+        }
+    }
+
+    return 0;
+}
+```
