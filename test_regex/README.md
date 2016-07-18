@@ -290,3 +290,54 @@ int main()
 |m.format(fmt,mft)|同上，返回一个string，fmt可以是一个string，也可以是指向空字符结尾的字符数组指针|
 |regex\_replace(dest,seq,r,fmt,mft)|遍历seq，用regex\_search查找与r匹配的子串。使用格式字符串fmt和可选的match\_flag\_type来标志生成输出，将输出写入迭代器dest指向的位置，并接受一对迭代器seq表示范围|
 |regex\_replace(seq,r,fmt,mft)|同上，返回一个string，seq既可以是一个string，也可以是一个指向空字符结尾的字符数组指针|
+
+
+#####test.7--替换电话号码格式
+
+```
+
+#include<iostream>
+#include<fstream>
+#include<regex>
+using namespace std;
+
+int main()
+{
+    ifstream ifs;
+    string phone = "(\\()?(\\d{3})(\\))?([-. ])?(\\d{3})([-. ])?(\\d{4})";
+    string fmt = "$2.$5.$7";
+    regex r(phone);
+    ifs.open("test7.txt");
+    if(!ifs)
+    {
+        cout<<"test7.txt open error"<<endl;
+        return -1;
+    }
+    string line;
+    while(getline(ifs,line))
+    {
+        cout<<regex_replace(line,r,fmt)<<endl;
+    }
+    return 0;
+
+}
+```
+
+
+|匹配标志|作用|
+|:---:|:---:|
+|match\_default|同format\_default|
+|match\_not\_bol|不将首字符作为行首处理|
+|match\_not\_eol|不将尾字符作为行尾处理|
+|match\_not\_bow|不将首字符作为单词首处理|
+|match\_not\_eow|不将尾字符作为单词尾处理|
+|match\_any|如果存在多个匹配，则可返回任意一个匹配|
+|match\_not\_null|不匹配任何空序列|
+|match\_continuous|匹配必须从输入到首字符开始|
+|match\_prev\_avail|输入序列包含第一个匹配之前的内容|
+|format\_default|使用ECMAScript规则替换字符串|
+|format\_sed|用posix sed规则替换字符串|
+|format\_no\_copy|不输出输入序列中未匹配到部分|
+|format\_first\_only|只替换子表达式的第一次出现|
+
+
