@@ -280,3 +280,13 @@ int main()
     return 0;
 }
 ```
+####使用regex\_replace
+
+当我们希望在输入序列中查找并替换一个正则表达式时可以调用regex\_replace
+
+|替换操作|作用|
+|:---:|:---:|
+|m.format(dest,fmt,mft)|使用格式化输出，匹配在m中，可选的match\_flag\_type在mft中。写入迭代器dest指向的目的位置，fmt可以是一个string，也可以是表示字符数组中范围的一对指针|
+|m.format(fmt,mft)|同上，返回一个string，fmt可以是一个string，也可以是指向空字符结尾的字符数组指针|
+|regex\_replace(dest,seq,r,fmt,mft)|遍历seq，用regex\_search查找与r匹配的子串。使用格式字符串fmt和可选的match\_flag\_type来标志生成输出，将输出写入迭代器dest指向的位置，并接受一对迭代器seq表示范围|
+|regex\_replace(seq,r,fmt,mft)|同上，返回一个string，seq既可以是一个string，也可以是一个指向空字符结尾的字符数组指针|
