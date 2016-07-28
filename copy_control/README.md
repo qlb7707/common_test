@@ -152,10 +152,63 @@ struct NoCopy{
 class HasPtr{
     public:
         HasPtr(const std::string &s = std::string()):ps(new std::string(s)),i(0){}
-
+        //对ps指向的string，每个HasPtr对象都有自己的拷贝
+        HasPtr(const HasPtr &p):ps(new std::string(*p.ps)),i(p.i){}
+        HasPtr& operator=(const HasPtr &);
+        ~HasPtr(){delete ps;}
+    private:
+        std::string *ps;
+        int i;
 }
 ```
 
+####拷贝赋值运算符
+赋值运算符会销毁左侧运算对象的资源，从右侧运算对象拷贝数据。此外拷贝赋值运算符必须是异常安全的，当发生异常时将左侧运算对象置于有意义的状态。
+通过先拷贝右侧运算对象可以处理自赋值，并能保证异常发生代码也是安全的。
+
+```
+HasPtr& operator=(const HasPtr &rhs)
+{
+    auto newp = new string(*rhs.ps);
+    delete ps;
+    ps = newp;
+    i = rhs.i;
+    return this;
+}
+```
+
+
+
+###定义行为像指针的类
+
+对于行为像指针的类，我们需要为其定义将拷贝构造函数和拷贝赋值运算符，来拷贝成员本身，而不是其指向的string。类仍需要自己的析构函数来释放string参数的构造函数分配的内存，但不能单方面释放关联的string，只有当最后一个指向string的HasPtr销毁时才能释放string。
+
+令一个类展现类似指针的行为的最好的方法是使用shared\_ptr来管理类中的资源。
+
+有时希望直接管理资源，使用引用计数就很有用
+
+工作方式：
+
+- 除了初始化对象，每个构造函数（拷贝构造除外）还要建立一个引用计数，记录有多少对象域正在创建对对象共享状态
+- 拷贝构造函数不重新分配计数器，而是拷贝对象的数据成员，包括计数器。拷贝构造函数递增计数器
+- 析构函数递减计数器。如果计数器变为0，则析构函数释放状态
+- 拷贝复制运算符递增右侧对象的计数器，递减左侧对象的计数器，如果左侧运算对象的计数器变为0，拷贝肤质运算销毁状态
+
+```
+class HasPtr{
+    public:
+        HasPtr(const std::string &s = std::string()):ps(new std::string(s)),i(0),use(new std::size_t(1)){}
+        HasPtr(const HasPtr &p):ps(p.ps),i(p.i),use(p.use){
+        ++*use;
+        }
+        HasPtr& operator=(const HasPtr&);
+        ~HasPtr();
+    private:
+        std::string *ps;
+        int i;
+        std::size_t *use;
+};
+```
 ##交换操作
 
 ##拷贝控制示例
