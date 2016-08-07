@@ -209,6 +209,44 @@ class HasPtr{
         std::size_t *use;
 };
 ```
+
+####类指针的拷贝成员“篡改”引用计数
+- 当拷贝或赋值时副本和原对象都指向相同的string，即拷贝ps本身而非ps指向的string
+- 拷贝时还会递增引用计数器
+- 析构函数不能无条件的delete ps －－可能还有其他对象指向这块内存，析构函数应该递减引用计数，如果计数器变为0，则释放ps和use指向的内存
+
+```
+HasPtr::~HasPtr()
+{
+    if(--*use == 0)
+    {
+        delete ps;
+        delete use;
+    }
+}
+
+```
+
+
+- 拷贝赋值执行类似拷贝构造和析构函数的作用。即递增右侧运算对象的引用计数，递减左侧运算对象的引用计数，必要时释放内存。
+- 赋值运算符必须处理自赋值，通过先递增rhs中的计数，然后再递减左侧运算对象的计数来实现
+
+
+```
+HasPtr& HasPtr::operator=(const HasPtr &rhs)
+{
+    ++*rhs.use;
+    if(--*use == 0)
+    {
+        delete ps;
+        delete use;
+    }
+    ps = rhs.ps;
+    i = rhs.i;
+    use = rhs.use;
+    return *this;
+}
+```
 ##交换操作
 
 ##拷贝控制示例
